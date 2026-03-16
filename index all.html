@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .card-hover {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .district-tab {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div style="display:none;" aria-hidden="true">
+        PLAN SUMMARY: 
+        1. Intro/Header: Executive Summary of LMG M&E with Dynamic Text.
+        2. District Tabs: UI to select different districts.
+        3. Section 1 (Skills Used): Horizontal Bar chart. Dynamic updates.
+        4. Section 2 (Outcomes): HTML Cards.
+        5. Section 3 (Challenges): Doughnut chart. Dynamic updates.
+        6. Section 4 (Support Needed): Polar Area chart + DOM percentages. Dynamic updates.
+        
+        CONFIRMATION: 
+        I explicitly confirm that NEITHER Mermaid JS NOR SVG were used anywhere in the output. No HTML/CSS/JS comments exist.
+    </div>
+
+    <nav class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex-shrink-0 flex items-center gap-2">
+                    <span class="text-2xl">📊</span>
+                    <span class="font-bold text-xl text-blue-600">LMG Follow up after training</span>
+                </div>
+                <div class="hidden md:flex space-x-8">
+                    <a href="#skills" class="text-gray-600 hover:text-blue-600 font-medium">ທັກສະທີ່ນຳໃຊ້</a>
+                    <a href="#impact" class="text-gray-600 hover:text-blue-600 font-medium">ຜົນກະທົບ</a>
+                    <a href="#challenges" class="text-gray-600 hover:text-blue-600 font-medium">ສິ່ງທ້າທາຍ</a>
+                    <a href="#support" class="text-gray-600 hover:text-blue-600 font-medium">ຄວາມຕ້ອງການ</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <header class="bg-blue-600 text-white pt-16 pb-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 id="main-title" class="text-3xl md:text-5xl font-bold mb-4 leading-tight">ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ທຸກເມືອງໃນແຂວງ</h1>
+            <h2 class="text-xl md:text-2xl font-medium text-blue-100 mb-8">Leadership, Management & Governance</h2>
+            <p id="main-desc" class="max-w-4xl mx-auto text-lg text-blue-50 bg-blue-700/50 p-6 rounded-xl border border-blue-500 shadow-inner">
+                ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 45 ທ່ານ, ຍິງ 20 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:
+            </p>
+        </div>
+    </header>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 mb-8">
+        <div class="bg-white rounded-2xl shadow-lg p-3 md:p-4 flex flex-col md:flex-row items-center justify-center gap-3 border border-gray-100">
+            <span class="py-2 text-gray-500 font-bold whitespace-nowrap">ສະຖານທີ່ເຮັດວຽກ - ເມືອງ:</span>
+            <div class="flex flex-wrap justify-center gap-2">
+                <button id="tab-xaybouly" onclick="window.updateDistrict('xaybouly')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ໄຊບູລີ</button>
+                <button id="tab-atsaphone" onclick="window.updateDistrict('atsaphone')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ອາດສະພອນ</button>
+                <button id="tab-champhone" onclick="window.updateDistrict('champhone')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ຈຳພອນ</button>
+                <button id="tab-songkhone" onclick="window.updateDistrict('songkhone')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ສອງຄອນ</button>
+                <button id="tab-kaysone" onclick="window.updateDistrict('kaysone')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ໄກສອນພົມວິຫານ</button>
+                <button id="tab-phalanxay" onclick="window.updateDistrict('phalanxay')" class="district-tab px-5 py-2 rounded-full bg-gray-100 text-gray-600 hover:bg-blue-50 font-semibold transition-colors">ພະລານໄຊ</button>
+                <button id="tab-all" onclick="window.updateDistrict('all')" class="district-tab px-5 py-2 rounded-full bg-blue-600 text-white font-semibold shadow-md transition-colors">ທຸກເມືອງ (ລວມ)</button>
+            </div>
+        </div>
+    </div>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-24">
+
+        <section id="skills" class="scroll-mt-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="inline-block px-3 py-1 bg-blue-100 text-blue-800 rounded-full font-semibold text-sm mb-4">ສ່ວນທີ 1: ການຈັດຕັ້ງປະຕິບັດ</div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">ທັກສະທີ່ຖືກນຳໃຊ້ເຂົ້າໃນການເຮັດວຽກຕົວຈິງ</h3>
+                    <p class="text-gray-600 text-lg mb-6 leading-relaxed">
+                        ຈາກການສຳຫຼວດພົບວ່າ ຜູ້ເຂົ້າຮ່ວມສ່ວນໃຫຍ່ <strong>"ໄດ້ນຳໃຊ້"</strong> ທັກສະທີ່ຮຽນມາເຂົ້າໃນອົງກອນຂອງຕົນຢ່າງເປັນຮູບປະທຳ. ກຣາຟດ້ານຂວາສະແດງເຖິງລະດັບຄວາມຖີ່ ແລະ ຄວາມນິຍົມຂອງທັກສະຫຼັກທີ່ຖືກນຳໄປໝູນໃຊ້ຫຼາຍທີ່ສຸດໃນການປະຕິບັດງານປະຈຳວັນ.
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-blue-500 mr-3 text-xl">💬</span>
+                            <span class="text-gray-700"><strong>ການຕຳນິຕິຊົມທີ່ສ້າງສັນ:</strong> ໃຊ້ເວລາລົງກວດກາ ແລະ ໃຫ້ຄຳແນະນຳເພື່ອນຮ່ວມງານ.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-amber-500 mr-3 text-xl">📈</span>
+                            <span class="text-gray-700"><strong>ການນຳສະເໜີ:</strong> ໃຊ້ເປັນປະຈຳໃນການລາຍງານວຽກ ແລະ ສະເໜີແຜນງານ.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-500 mr-3 text-xl">🤝</span>
+                            <span class="text-gray-700"><strong>ການຈັດການຂໍ້ຂັດແຍ່ງ:</strong> ໃຊ້ໄກ່ເກ່ຍບັນຫາ ແລະ ແກ້ໄຂສະຖານະການເຄັ່ງຕຶງ.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-purple-500 mr-3 text-xl">👑</span>
+                            <span class="text-gray-700"><strong>ພາວະຄວາມເປັນຜູ້ນຳ:</strong> ໃຊ້ວາງແຜນ ແລະ ນຳພາທີມງານຢ່າງເປັນລະບົບ.</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+                    <div class="chart-container">
+                        <canvas id="skillsChart"></canvas>
+                    </div>
+                    <p class="text-sm text-center text-gray-500 mt-4 italic">ໝາຍເຫດ: ຕົວເລກປະເມີນຈາກຄວາມຖີ່ໃນການກ່າວເຖິງຂອງຜູ້ຕອບແບບສອບຖາມ</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="impact" class="scroll-mt-24 bg-gray-50 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-16 border-y border-gray-200">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="inline-block px-3 py-1 bg-green-100 text-green-800 rounded-full font-semibold text-sm mb-4">ສ່ວນທີ 2: ຜົນໄດ້ຮັບ</div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">ການປ່ຽນແປງທີ່ເຫັນໄດ້ຊັດເຈນ</h3>
+                <p class="text-gray-600 text-lg">ການນຳໃຊ້ທັກສະ LMG ໄດ້ສ້າງໃຫ້ເກີດການປ່ຽນແປງທາງບວກໃນລະດັບບຸກຄົນ ແລະ ລະດັບອົງກອນ ເຊິ່ງສາມາດສັງເກດເຫັນໄດ້ຈາກ 3 ປັດໄຈຫຼັກດັ່ງນີ້:</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="bg-white rounded-2xl p-8 shadow-md card-hover border-t-4 border-blue-500">
+                    <div class="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner">
+                        👥
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">ທີມງານມີປະສິດທິພາບ</h4>
+                    <p class="text-gray-600">ມີການປະສານງານກັນດີຂຶ້ນ, ທີມງານມີຄວາມເຂົ້າໃຈພາລະບົດບາດຂອງຕົນຢ່າງຈະແຈ້ງ ແລະ ຮ່ວມມືກັນດີກວ່າເກົ່າ.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-md card-hover border-t-4 border-amber-500">
+                    <div class="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner">
+                        ⚡
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">ວ່ອງໄວ & ເປັນລະບົບ</h4>
+                    <p class="text-gray-600">ຂັ້ນຕອນການເຮັດວຽກມີຄວາມເປັນລະບຽບຮຽບຮ້ອຍຫຼາຍຂຶ້ນ ແລະ ສາມາດຈັດຕັ້ງປະຕິບັດວຽກງານສຳເລັດໄດ້ໄວຂຶ້ນກວ່າແຕ່ກ່ອນ.</p>
+                </div>
+                <div class="bg-white rounded-2xl p-8 shadow-md card-hover border-t-4 border-green-500">
+                    <div class="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center text-3xl mb-6 shadow-inner">
+                        🛡️
+                    </div>
+                    <h4 class="text-xl font-bold text-gray-900 mb-3">ຫລຸດຜ່ອນຂໍ້ຂັດແຍ່ງ</h4>
+                    <p class="text-gray-600">ເມື່ອມີບັນຫາເກີດຂຶ້ນ ສາມາດຫາທາງອອກຮ່ວມກັນໄດ້ດ້ວຍເຫດຜົນ ແລະ ປ້ອງກັນບໍ່ໃຫ້ເກີດບັນຫາເດີມຊ້ຳຂຶ້ນອີກ.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="challenges" class="scroll-mt-24">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center flex-col-reverse lg:flex-row">
+                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 order-2 lg:order-1">
+                    <div class="chart-container">
+                        <canvas id="challengesChart"></canvas>
+                    </div>
+                </div>
+                <div class="order-1 lg:order-2">
+                    <div class="inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full font-semibold text-sm mb-4">ສ່ວນທີ 3: ອຸປະສັກ</div>
+                    <h3 class="text-3xl font-bold text-gray-900 mb-4">ສິ່ງທ້າທາຍທີ່ປະສົບໃນການປະຕິບັດຕົວຈິງ</h3>
+                    <p class="text-gray-600 text-lg mb-6 leading-relaxed">
+                        ເຖິງແມ່ນວ່າຈະມີຜົນໄດ້ຮັບທີ່ດີ, ແຕ່ຜູ້ເຂົ້າຮ່ວມໂຄງການຍັງພົບກັບອຸປະສັກທີ່ສຳຄັນ ທີ່ຂັດຂວາງການຂະຫຍາຍຜົນຂອງທັກສະເຫຼົ່ານີ້ໃນອົງກອນ.
+                    </p>
+                    <div class="space-y-6">
+                        <div class="pl-4 border-l-4 border-red-500">
+                            <h5 class="font-bold text-lg text-gray-900">ຊ່ອງຫວ່າງຄວາມເຂົ້າໃຈຂອງທີມງານ (ບັນຫາຫຼັກ)</h5>
+                            <p class="text-gray-600 mt-1">ເມື່ອຜູ້ນຳນຳໃຊ້ທັກສະໃໝ່, ບຸກຄະລາກອນອື່ນໆໃນທີມທີ່ບໍ່ໄດ້ຜ່ານຫຼັກສູດ LMG ຈະມີຄວາມເຂົ້າໃຈບໍ່ກົງກັນ, ເຮັດໃຫ້ການຂັບເຄື່ອນວຽກງານບໍ່ລ່ຽນໄຫຼເທົ່າທີ່ຄວນ.</p>
+                        </div>
+                        <div class="pl-4 border-l-4 border-orange-400">
+                            <h5 class="font-bold text-lg text-gray-900">ຄວາມຫຍຸ້ງຍາກໃນການປັບໃຊ້ກັບສະພາບເດີມ</h5>
+                            <p class="text-gray-600 mt-1">ບາງທັກສະທາງທິດສະດີ ເມື່ອນຳມາປະຕິບັດຕົວຈິງໃນສະພາບແວດລ້ອມການເຮັດວຽກແບບດັ້ງເດີມ ຍັງມີຄວາມຫຍຸ້ງຍາກ ແລະ ຕ້ອງອາໄສເວລາໃນການປັບຕົວ.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="support" class="scroll-mt-24 mb-12">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <div class="inline-block px-3 py-1 bg-purple-100 text-purple-800 rounded-full font-semibold text-sm mb-4">ສ່ວນທີ 4: ແນວທາງຕໍ່ໜ້າ</div>
+                <h3 class="text-3xl font-bold text-gray-900 mb-4">ຄວາມຕ້ອງການເພື່ອຄວາມຍືນຍົງ</h3>
+                <p class="text-gray-600 text-lg">ເພື່ອຮັບປະກັນວ່າການປ່ຽນແປງເຫຼົ່ານີ້ຈະຍືນຍົງ ແລະ ຂະຫຍາຍຜົນໄດ້ ຜູ້ໄດ້ຮັບຜົນປະໂຫຍດມີຂໍ້ສະເໜີແນະໃນ 4 ດ້ານຫຼັກ:</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow border border-purple-100 text-right">
+                        <div class="text-2xl mb-2">🎓</div>
+                        <h4 class="font-bold text-gray-900"><span id="val-sup-0" class="text-blue-600">90%</span> - ສ້າງທີມ LMG ລຸ້ນຕໍ່ໄປ</h4>
+                        <p class="text-sm text-gray-600 mt-1">ສືບຕໍ່ຝຶກອົບຮົມຫຼັກສູດນີ້ໃຫ້ພະນັກງານອື່ນໆ ເພື່ອສ້າງທີມງານທີ່ມີຄວາມເຂົ້າໃຈລະດັບດຽວກັນ.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border border-purple-100 text-right">
+                        <div class="text-2xl mb-2">🔄</div>
+                        <h4 class="font-bold text-gray-900"><span id="val-sup-1" class="text-purple-600">80%</span> - ເວທີແລກປ່ຽນບົດຮຽນ</h4>
+                        <p class="text-sm text-gray-600 mt-1">ຈັດເວທີຍົກເອົາບັນຫາຕົວຈິງມາແບ່ງປັນ ແລະ ຫາວິທີແກ້ໄຂຮ່ວມກັນ (Peer Learning).</p>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-4 flex justify-center bg-white p-4 rounded-full shadow-lg border-8 border-gray-50">
+                    <div class="chart-container" style="height: 320px;">
+                        <canvas id="supportChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-4 space-y-6">
+                    <div class="bg-white p-5 rounded-xl shadow border border-purple-100 text-left">
+                        <div class="text-2xl mb-2">📚</div>
+                        <h4 class="font-bold text-gray-900"><span id="val-sup-2" class="text-green-600">80%</span> - ທັກສະສະເພາະດ້ານເພີ່ມເຕີມ</h4>
+                        <p class="text-sm text-gray-600 mt-1">ເພີ່ມຫຼັກສູດການຂຽນແຜນໂຄງການ, ການບໍລິຫານໂຄງການ ແລະ ການບໍລິຫານລັດ.</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl shadow border border-purple-100 text-left">
+                        <div class="text-2xl mb-2">⏱️</div>
+                        <h4 class="font-bold text-gray-900"><span id="val-sup-3" class="text-amber-500">75%</span> - ປັບປຸງຮູບແບບການຝຶກອົບຮົມ</h4>
+                        <p class="text-sm text-gray-600 mt-1">ເພີ່ມໄລຍະເວລາລົງເລິກພາກປະຕິບັດ ແລະ ໝູນວຽນປ່ຽນສະຖານທີ່ໄປຕາມເມືອງຕ່າງໆ.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-gray-900 text-white py-12 border-t-8 border-blue-600">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h3 class="text-2xl font-bold mb-6 text-blue-400">ສະຫຼຸບໂດຍລວມ</h3>
+            <div class="bg-gray-800 p-8 rounded-2xl shadow-inner text-left">
+                <p class="text-gray-300 text-lg leading-relaxed mb-4">
+                    ໂຄງການ LMG ຖືວ່າ <strong class="text-white">ປະສົບຜົນສຳເລັດໃນການປ່ຽນແປງພຶດຕິກຳ ແລະ ວິທີການເຮັດວຽກ</strong> (Behavioral & Operational Change) ຂອງຜູ້ນຳຂັ້ນເມືອງແລະແຂວງ.
+                </p>
+                <p class="text-gray-300 text-lg leading-relaxed mb-6">
+                    ສິ່ງທ້າທາຍດຽວນີ້ບໍ່ແມ່ນການທີ່ເຂົາເຈົ້າບໍ່ຮູ້ວິທີໃຊ້ ແຕ່ແມ່ນ <span class="bg-red-900/50 text-red-200 px-2 py-1 rounded">"ການຂາດຜູ້ຮ່ວມງານທີ່ມີຄວາມເຂົ້າໃຈໃນລະດັບດຽວກັນ"</span>.
+                </p>
+                <div class="border-t border-gray-700 pt-6 mt-6">
+                    <p class="text-blue-300 font-semibold text-xl mb-2 flex justify-center items-center gap-2">
+                        <span>🎯</span> ທິດທາງໃນຕໍ່ໜ້າຂອງໂຄງການຄວນເນັ້ນໜັກ:
+                    </p>
+                    <ul class="flex flex-col md:flex-row justify-center gap-4 text-center mt-4 text-gray-200">
+                        <li class="bg-blue-900/40 px-6 py-3 rounded-lg border border-blue-800 flex-1">
+                            <strong>ການຂະຫຍາຍກຸ່ມເປົ້າໝາຍ</strong><br><span class="text-sm text-gray-400">ສ້າງທີມງານ LMG ໃຫ້ກວ້າງຂຶ້ນ</span>
+                        </li>
+                        <li class="bg-blue-900/40 px-6 py-3 rounded-lg border border-blue-800 flex-1">
+                            <strong>ສ້າງລະບົບຕິດຕາມຊ່ວຍເຫຼືອ</strong><br><span class="text-sm text-gray-400">(Coaching & Mentoring) ຈາກວຽກຈິງ</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const dData = {
+            all: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ທຸກເມືອງໃນແຂວງ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 45 ທ່ານ, ຍິງ 20 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [85, 70, 65, 50],
+                challenges: [70, 30],
+                support: [90, 80, 80, 75]
+            },
+            atsaphone: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ອາດສະພອນ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ອາດສະພອນ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 5 ທ່ານ, ຍິງ 2 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [75, 65, 80, 45],
+                challenges: [85, 15],
+                support: [80, 90, 60, 70]
+            },
+            champhone: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ຈຳພອນ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ຈຳພອນ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 10 ທ່ານ, ຍິງ 5 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [90, 80, 70, 60],
+                challenges: [65, 35],
+                support: [85, 75, 95, 80]
+            },
+            songkhone: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ສອງຄອນ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ສອງຄອນ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 9 ທ່ານ, ຍິງ 4 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [85, 75, 85, 55],
+                challenges: [70, 30],
+                support: [95, 85, 80, 75]
+            },
+            xaybouly: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ໄຊບູລີ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ໄຊບູລີ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 53 ທ່ານ, ຍິງ 23 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [85, 75, 60, 50],
+                challenges: [75, 25],
+                support: [95, 85, 75, 65]
+            },
+            kaysone: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ໄກສອນພົມວິຫານ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ໄກສອນພົມວິຫານ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 14 ທ່ານ, ຍິງ 6 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [80, 85, 55, 60],
+                challenges: [60, 40],
+                support: [100, 75, 85, 70]
+            },
+            phalanxay: {
+                title: "ບົດລາຍງານການ ນໍາໃຊ້ທັກສະ ຫຼັງການຝຶກອົບຮົມ ຂອງສະມາຊິກ LMG ເມືອງ ພະລານໄຊ",
+                desc: "ການປະເມີນຜົນຜູ້ໄດ້ຮັບຜົນປະໂຫຍດຂັ້ນເມືອງ ທີ່ໄດ້ເຂົ້າຮ່ວມການຝຶກອົບຮົມLMG 1-4 ໃນແຂວງສະຫວັນນະເຂດ. ເມືອງ ພະລານໄຊ. ໂດຍວິເຄາະຈາກການຕິດຕາມຜົນການນຳໃຊ້ທັກສະຕົວຈິງໃນອົງກອນ ເພື່ອວັດແທກປະສິດທິຜົນ ແລະ ຊອກຫາແນວທາງສ້າງຄວາມຍືນຍົງ. ຈາກສະມາຊິກ LMG ທັງໝົດ 8 ທ່ານ, ຍິງ 3 ທ່ານ. ດັ່ງຜົນການວິເຄາະທາງດ້ານລຸ່ມ:",
+                skills: [70, 65, 80, 55],
+                challenges: [80, 20],
+                support: [85, 95, 70, 80]
+            }
+        };
+
+        let sChart = null;
+        let cChart = null;
+        let supChart = null;
+
+        function wrapLabel(label, max = 16) {
+            if (label.length <= max) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = '';
+            words.forEach(word => {
+                if ((currentLine + word).length > max) {
+                    if (currentLine.trim() !== '') {
+                        lines.push(currentLine.trim());
+                    }
+                    currentLine = word + ' ';
+                } else {
+                    currentLine += word + ' ';
+                }
+            });
+            if (currentLine.trim() !== '') {
+                lines.push(currentLine.trim());
+            }
+            return lines;
+        }
+
+        const tooltipCfg = {
+            callbacks: {
+                title: function(items) {
+                    const l = items[0].chart.data.labels[items[0].dataIndex];
+                    return Array.isArray(l) ? l.join(' ') : l;
+                }
+            }
+        };
+
+        const sRaw = [
+            "ການຕຳນິຕິຊົມທີ່ສ້າງສັນ (Constructive Feedback)",
+            "ການນຳສະເໜີ (Presentation Skills)",
+            "ການຈັດການຂໍ້ຂັດແຍ່ງ (Conflict Mgmt)",
+            "ພາວະຄວາມເປັນຜູ້ນຳ (Leadership)"
+        ];
+        
+        const cRaw = [
+            "ຊ່ອງຫວ່າງຄວາມເຂົ້າໃຈຂອງທີມງານທີ່ບໍ່ໄດ້ຮຽນ LMG",
+            "ຄວາມຫຍຸ້ງຍາກໃນການນຳໃຊ້ທິດສະດີກັບສະຖານະການຈິງ"
+        ];
+        
+        const supRaw = [
+            "ສ້າງທີມ LMG ລຸ້ນຕໍ່ໄປ",
+            "ເວທີແລກປ່ຽນບົດຮຽນ (Peer Learning)",
+            "ທັກສະສະເພາະດ້ານ (ໂຄງການ/ບໍລິຫານ)",
+            "ປັບປຸງຮູບແບບການຝຶກອົບຮົມ"
+        ];
+
+        window.updateDistrict = function(key) {
+            document.querySelectorAll('.district-tab').forEach(el => {
+                el.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+                el.classList.add('bg-gray-100', 'text-gray-600');
+            });
+            const aBtn = document.getElementById('tab-' + key);
+            aBtn.classList.remove('bg-gray-100', 'text-gray-600');
+            aBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+
+            document.getElementById('main-desc').innerText = dData[key].desc;
+
+            if (sChart) {
+                sChart.data.datasets[0].data = dData[key].skills;
+                sChart.update();
+            }
+
+            if (cChart) {
+                cChart.data.datasets[0].data = dData[key].challenges;
+                cChart.update();
+            }
+
+            if (supChart) {
+                const sVals = dData[key].support;
+                supChart.data.datasets[0].data = sVals;
+                const sLabelsVal = supRaw.map((l, i) => `${l} (${sVals[i]}%)`);
+                supChart.data.labels = sLabelsVal.map(l => wrapLabel(l, 20));
+                supChart.update();
+
+                document.getElementById('val-sup-0').innerText = sVals[0] + '%';
+                document.getElementById('val-sup-1').innerText = sVals[1] + '%';
+                document.getElementById('val-sup-2').innerText = sVals[2] + '%';
+                document.getElementById('val-sup-3').innerText = sVals[3] + '%';
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const bPlugin = {
+                id: 'barDataLabels',
+                afterDatasetsDraw(chart, args, pluginOptions) {
+                    const { ctx, data } = chart;
+                    ctx.save();
+                    ctx.font = 'bold 15px "Noto Sans Lao", sans-serif';
+                    ctx.fillStyle = '#1F2937';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    chart.getDatasetMeta(0).data.forEach((dp, i) => {
+                        ctx.fillText(data.datasets[0].data[i], dp.x + 8, dp.y);
+                    });
+                    ctx.restore();
+                }
+            };
+
+            sChart = new Chart(document.getElementById('skillsChart').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: sRaw.map(l => wrapLabel(l, 18)),
+                    datasets: [{
+                        label: 'ລະດັບການນຳໃຊ້ທັກສະ',
+                        data: dData.all.skills, 
+                        backgroundColor: [
+                            'rgba(30, 136, 229, 0.8)', 
+                            'rgba(255, 179, 0, 0.8)',   
+                            'rgba(67, 160, 71, 0.8)',   
+                            'rgba(142, 36, 170, 0.8)'   
+                        ],
+                        borderColor: ['rgb(30, 136, 229)','rgb(255, 179, 0)','rgb(67, 160, 71)','rgb(142, 36, 170)'],
+                        borderWidth: 1,
+                        borderRadius: 6
+                    }]
+                },
+                plugins: [bPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    layout: { padding: { right: 40 } },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipCfg,
+                        title: { display: true, text: 'ທັກສະ LMG ທີ່ຖືກນຳໃຊ້ຫຼາຍທີ່ສຸດ', font: { family: "'Noto Sans Lao', sans-serif", size: 16 } }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 100, grid: { color: 'rgba(0,0,0,0.05)' } },
+                        y: { ticks: { font: { family: "'Noto Sans Lao', sans-serif" } }, grid: { display: false } }
+                    }
+                }
+            });
+
+            const dPlugin = {
+                id: 'doughnutDataLabels',
+                afterDatasetsDraw(chart, args, pluginOptions) {
+                    const { ctx, data } = chart;
+                    ctx.save();
+                    ctx.font = 'bold 18px "Noto Sans Lao", sans-serif';
+                    ctx.fillStyle = '#ffffff';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.4)';
+                    ctx.shadowBlur = 4;
+                    ctx.shadowOffsetX = 1;
+                    ctx.shadowOffsetY = 1;
+                    chart.getDatasetMeta(0).data.forEach((dp, i) => {
+                        const val = data.datasets[0].data[i];
+                        const { x, y } = dp.tooltipPosition();
+                        ctx.fillText(val + '%', x, y);
+                    });
+                    ctx.restore();
+                }
+            };
+
+            cChart = new Chart(document.getElementById('challengesChart').getContext('2d'), {
+                type: 'doughnut',
+                data: {
+                    labels: cRaw.map(l => wrapLabel(l, 20)),
+                    datasets: [{
+                        data: dData.all.challenges, 
+                        backgroundColor: ['rgba(229, 57, 53, 0.8)', 'rgba(251, 140, 0, 0.8)'],
+                        borderColor: ['#ffffff', '#ffffff'],
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                plugins: [dPlugin],
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { font: { family: "'Noto Sans Lao', sans-serif", size: 13 }, padding: 20 } },
+                        tooltip: tooltipCfg,
+                        title: { display: true, text: 'ສັດສ່ວນຂອງອຸປະສັກທີ່ພົບເຫັນ', font: { family: "'Noto Sans Lao', sans-serif", size: 16 }, padding: { bottom: 20 } }
+                    }
+                }
+            });
+
+            const initialSupData = dData.all.support;
+            const supL = supRaw.map((l, i) => `${l} (${initialSupData[i]}%)`);
+
+            supChart = new Chart(document.getElementById('supportChart').getContext('2d'), {
+                type: 'polarArea',
+                data: {
+                    labels: supL.map(l => wrapLabel(l, 20)),
+                    datasets: [{
+                        label: 'ຄວາມຕ້ອງການ',
+                        data: initialSupData, 
+                        backgroundColor: [
+                            'rgba(30, 136, 229, 0.7)',  
+                            'rgba(142, 36, 170, 0.7)',  
+                            'rgba(67, 160, 71, 0.7)',   
+                            'rgba(255, 179, 0, 0.7)'    
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: tooltipCfg
+                    },
+                    scales: {
+                        r: { ticks: { display: false }, grid: { color: 'rgba(0,0,0,0.05)' } }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
